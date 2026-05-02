@@ -119,6 +119,7 @@ function Page() {
             <ProductSearch
               products={products}
               onSelect={(p) => setForm({ ...form, product_id: p.id })}
+              keepValue
             />
           </div>
           <div>

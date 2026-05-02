@@ -9,9 +9,10 @@ type Props = {
   onSelect: (product: Product) => void;
   placeholder?: string;
   renderExtra?: (product: Product) => React.ReactNode;
+  keepValue?: boolean;
 };
 
-export function ProductSearch({ products, onSelect, placeholder = "Buscar producto...", renderExtra }: Props) {
+export function ProductSearch({ products, onSelect, placeholder = "Buscar producto...", renderExtra, keepValue }: Props) {
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -34,7 +35,7 @@ export function ProductSearch({ products, onSelect, placeholder = "Buscar produc
 
   const select = (p: Product) => {
     onSelect(p);
-    setSearch("");
+    setSearch(keepValue ? p.name : "");
     setShowDropdown(false);
     setHighlightIndex(-1);
   };
