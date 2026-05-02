@@ -1,4 +1,7 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
 
@@ -29,11 +32,11 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Inventario Pro — Gestión de inventario, compras y ventas" },
+      { name: "description", content: "Sistema profesional de gestión de inventario, compras y ventas con doble precio (USD/Bs)." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Inventario Pro" },
+      { property: "og:description", content: "Gestión profesional de inventario, compras y ventas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -65,5 +68,23 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col">
+          <header className="h-14 flex items-center gap-2 border-b bg-card px-4 sticky top-0 z-10">
+            <SidebarTrigger />
+            <h1 className="text-sm font-medium text-muted-foreground">
+              Sistema de Gestión de Inventario
+            </h1>
+          </header>
+          <main className="flex-1 p-6">
+            <Outlet />
+          </main>
+        </div>
+        <Toaster richColors position="top-right" />
+      </div>
+    </SidebarProvider>
+  );
 }
