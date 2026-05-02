@@ -68,7 +68,7 @@ function Page() {
     const [pRes, cRes, r] = await Promise.all([
       supabase
         .from("products")
-        .select("*, categories(name)")
+        .select("*, categories!products_category_fk(name)")
         .order("name"),
       supabase.from("categories").select("*").order("name"),
       getTodayRate(),
