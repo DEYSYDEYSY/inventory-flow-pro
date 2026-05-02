@@ -102,6 +102,28 @@ function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, to]);
 
+  const availableProducts = useMemo(
+    () => products.filter((p) => !cart.find((c) => c.product_id === p.id)),
+    [products, cart],
+  );
+
+  const filteredProducts = useMemo(() => {
+    const term = search.toLowerCase().trim();
+    return availableProducts.filter((p) =>
+      term ? p.name.toLowerCase().includes(term) : true,
+    );
+  }, [availableProducts, search]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   const addToCart = (productId: string) => {
     const p = products.find((x) => x.id === productId);
     if (!p) return;
@@ -123,23 +145,6 @@ function Page() {
     setShowDropdown(false);
     setHighlightIndex(-1);
   };
-
-  const filteredProducts = useMemo(() => {
-    const term = search.toLowerCase().trim();
-    return availableProducts.filter((p) =>
-      term ? p.name.toLowerCase().includes(term) : true,
-    );
-  }, [availableProducts, search]);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
 
   const updateQty = (id: string, qty: number) => {
     setCart((c) =>
@@ -177,7 +182,6 @@ function Page() {
     }));
     const { error: e2 } = await supabase.from("sale_items").insert(items);
     if (e2) {
-      // rollback sale
       await supabase.from("sales").delete().eq("id", sale.id);
       return toast.error(e2.message);
     }
@@ -196,11 +200,6 @@ function Page() {
     setDetailItems((data ?? []) as SaleItem[]);
     setDetailOpen(true);
   };
-
-  const availableProducts = useMemo(
-    () => products.filter((p) => !cart.find((c) => c.product_id === p.id)),
-    [products, cart],
-  );
 
   return (
     <div className="space-y-6">
