@@ -13,6 +13,7 @@ import { Route as SuppliersRouteImport } from './routes/suppliers'
 import { Route as SalesRouteImport } from './routes/sales'
 import { Route as PurchasesRouteImport } from './routes/purchases'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as ExchangeRatesRouteImport } from './routes/exchange-rates'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -36,6 +37,11 @@ const ProductsRoute = ProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExchangeRatesRoute = ExchangeRatesRouteImport.update({
+  id: '/exchange-rates',
+  path: '/exchange-rates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -50,6 +56,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
+  '/exchange-rates': typeof ExchangeRatesRoute
   '/products': typeof ProductsRoute
   '/purchases': typeof PurchasesRoute
   '/sales': typeof SalesRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
+  '/exchange-rates': typeof ExchangeRatesRoute
   '/products': typeof ProductsRoute
   '/purchases': typeof PurchasesRoute
   '/sales': typeof SalesRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/categories': typeof CategoriesRoute
+  '/exchange-rates': typeof ExchangeRatesRoute
   '/products': typeof ProductsRoute
   '/purchases': typeof PurchasesRoute
   '/sales': typeof SalesRoute
@@ -77,16 +86,25 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/categories'
+    | '/exchange-rates'
     | '/products'
     | '/purchases'
     | '/sales'
     | '/suppliers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/categories' | '/products' | '/purchases' | '/sales' | '/suppliers'
+  to:
+    | '/'
+    | '/categories'
+    | '/exchange-rates'
+    | '/products'
+    | '/purchases'
+    | '/sales'
+    | '/suppliers'
   id:
     | '__root__'
     | '/'
     | '/categories'
+    | '/exchange-rates'
     | '/products'
     | '/purchases'
     | '/sales'
@@ -96,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CategoriesRoute: typeof CategoriesRoute
+  ExchangeRatesRoute: typeof ExchangeRatesRoute
   ProductsRoute: typeof ProductsRoute
   PurchasesRoute: typeof PurchasesRoute
   SalesRoute: typeof SalesRoute
@@ -132,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/exchange-rates': {
+      id: '/exchange-rates'
+      path: '/exchange-rates'
+      fullPath: '/exchange-rates'
+      preLoaderRoute: typeof ExchangeRatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categories': {
       id: '/categories'
       path: '/categories'
@@ -152,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CategoriesRoute: CategoriesRoute,
+  ExchangeRatesRoute: ExchangeRatesRoute,
   ProductsRoute: ProductsRoute,
   PurchasesRoute: PurchasesRoute,
   SalesRoute: SalesRoute,
