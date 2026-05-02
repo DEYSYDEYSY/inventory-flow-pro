@@ -57,7 +57,7 @@ function Page() {
     const [pRes, prRes, sRes, rate] = await Promise.all([
       supabase
         .from("purchases")
-        .select("*, products(name), suppliers(name)")
+        .select("*, products!purchases_product_fk(name), suppliers!purchases_supplier_fk(name)")
         .order("purchase_date", { ascending: false })
         .order("created_at", { ascending: false }),
       supabase.from("products").select("id,name").order("name"),
