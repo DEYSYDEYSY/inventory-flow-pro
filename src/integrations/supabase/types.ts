@@ -14,7 +14,245 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      exchange_rates: {
+        Row: {
+          created_at: string
+          id: string
+          rate: number
+          rate_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rate: number
+          rate_date: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rate?: number
+          rate_date?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category_id: string | null
+          cost_unit_usd: number
+          created_at: string
+          id: string
+          min_stock: number
+          name: string
+          profit_margin: number
+          sale_price_bs: number
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          cost_unit_usd?: number
+          created_at?: string
+          id?: string
+          min_stock?: number
+          name: string
+          profit_margin?: number
+          sale_price_bs?: number
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          cost_unit_usd?: number
+          created_at?: string
+          id?: string
+          min_stock?: number
+          name?: string
+          profit_margin?: number
+          sale_price_bs?: number
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchases: {
+        Row: {
+          created_at: string
+          exchange_rate: number
+          id: string
+          invoice_number: string | null
+          product_id: string
+          purchase_date: string
+          quantity: number
+          supplier_id: string | null
+          total_cost_usd: number
+          unit_cost_usd: number
+        }
+        Insert: {
+          created_at?: string
+          exchange_rate: number
+          id?: string
+          invoice_number?: string | null
+          product_id: string
+          purchase_date?: string
+          quantity: number
+          supplier_id?: string | null
+          total_cost_usd: number
+          unit_cost_usd: number
+        }
+        Update: {
+          created_at?: string
+          exchange_rate?: number
+          id?: string
+          invoice_number?: string | null
+          product_id?: string
+          purchase_date?: string
+          quantity?: number
+          supplier_id?: string | null
+          total_cost_usd?: number
+          unit_cost_usd?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sale_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          sale_id: string
+          subtotal_bs: number
+          unit_price_bs: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          product_name: string
+          quantity: number
+          sale_id: string
+          subtotal_bs: number
+          unit_price_bs: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          sale_id?: string
+          subtotal_bs?: number
+          unit_price_bs?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          created_at: string
+          exchange_rate: number
+          id: string
+          sale_date: string
+          total_bs: number
+          total_usd: number
+        }
+        Insert: {
+          created_at?: string
+          exchange_rate: number
+          id?: string
+          sale_date?: string
+          total_bs?: number
+          total_usd?: number
+        }
+        Update: {
+          created_at?: string
+          exchange_rate?: number
+          id?: string
+          sale_date?: string
+          total_bs?: number
+          total_usd?: number
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          contact: string | null
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+        }
+        Insert: {
+          contact?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+        }
+        Update: {
+          contact?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
