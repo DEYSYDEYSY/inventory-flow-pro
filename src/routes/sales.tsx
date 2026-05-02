@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Trash2, Eye, Search } from "lucide-react";
+import { Plus, Trash2, Eye } from "lucide-react";
+import { ProductSearch } from "@/components/ProductSearch";
 import { toast } from "sonner";
 import { formatBs, formatUsd, todayISO } from "@/lib/format";
 import { getTodayRate } from "@/lib/queries";
@@ -61,10 +62,6 @@ function Page() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [rate, setRate] = useState(0);
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [search, setSearch] = useState("");
-  const [highlightIndex, setHighlightIndex] = useState(-1);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
@@ -107,43 +104,21 @@ function Page() {
     [products, cart],
   );
 
-  const filteredProducts = useMemo(() => {
-    const term = search.toLowerCase().trim();
-    return availableProducts.filter((p) =>
-      term ? p.name.toLowerCase().includes(term) : true,
-    );
-  }, [availableProducts, search]);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  const addToCart = (productId: string) => {
-    const p = products.find((x) => x.id === productId);
-    if (!p) return;
-    if (cart.find((c) => c.product_id === p.id)) {
+  const addToCart = (product: { id: string; name: string; stock: number; sale_price_bs: number }) => {
+    if (cart.find((c) => c.product_id === product.id)) {
       toast.error("Ya está en el carrito");
       return;
     }
     setCart([
       ...cart,
       {
-        product_id: p.id,
-        name: p.name,
-        unit_price_bs: Number(p.sale_price_bs),
+        product_id: product.id,
+        name: product.name,
+        unit_price_bs: Number(product.sale_price_bs),
         quantity: 1,
-        stock: Number(p.stock),
+        stock: Number(product.stock),
       },
     ]);
-    setSearch("");
-    setShowDropdown(false);
-    setHighlightIndex(-1);
   };
 
   const updateQty = (id: string, qty: number) => {
@@ -218,73 +193,15 @@ function Page() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2 items-end">
-            <div className="flex-1 relative" ref={searchRef}>
+            <div className="flex-1">
               <label className="text-sm font-medium">Agregar producto</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  className="pl-9"
-                  placeholder="Buscar producto..."
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setShowDropdown(true);
-                    setHighlightIndex(-1);
-                  }}
-                  onFocus={() => setShowDropdown(true)}
-                  onKeyDown={(e) => {
-                    if (!showDropdown || filteredProducts.length === 0) return;
-                    if (e.key === "ArrowDown") {
-                      e.preventDefault();
-                      setHighlightIndex((i) => Math.min(i + 1, filteredProducts.length - 1));
-                    } else if (e.key === "ArrowUp") {
-                      e.preventDefault();
-                      setHighlightIndex((i) => Math.max(i - 1, 0));
-                    } else if (e.key === "Enter" && highlightIndex >= 0) {
-                      e.preventDefault();
-                      addToCart(filteredProducts[highlightIndex].id);
-                    } else if (e.key === "Escape") {
-                      setShowDropdown(false);
-                    }
-                  }}
-                />
-              </div>
-              {showDropdown && filteredProducts.length > 0 && (
-                <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md max-h-56 overflow-y-auto">
-                  {filteredProducts.map((p, i) => (
-                    <button
-                      key={p.id}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-sm text-left transition-colors ${
-                        i === highlightIndex
-                          ? "bg-accent text-accent-foreground"
-                          : "hover:bg-accent hover:text-accent-foreground"
-                      }`}
-                      onMouseEnter={() => setHighlightIndex(i)}
-                      onMouseLeave={() => setHighlightIndex(-1)}
-                      onClick={() => addToCart(p.id)}
-                    >
-                      <span className="font-medium">{p.name}</span>
-                      <span className="text-xs text-muted-foreground">stock: {p.stock}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-              {showDropdown && search.trim() && filteredProducts.length === 0 && (
-                <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md p-3 text-sm text-muted-foreground">
-                  Sin resultados
-                </div>
-              )}
+              <ProductSearch
+                products={availableProducts}
+                onSelect={addToCart}
+                renderExtra={(p) => `stock: ${(p as Product).stock}`}
+              />
             </div>
-            <Button
-              onClick={() => {
-                if (highlightIndex >= 0 && filteredProducts[highlightIndex]) {
-                  addToCart(filteredProducts[highlightIndex].id);
-                } else if (filteredProducts.length === 1) {
-                  addToCart(filteredProducts[0].id);
-                }
-              }}
-              disabled={filteredProducts.length === 0}
-            >
+            <Button onClick={() => {}} disabled={availableProducts.length === 0}>
               <Plus className="h-4 w-4 mr-1" />
               Agregar
             </Button>

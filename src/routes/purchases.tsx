@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ProductSearch } from "@/components/ProductSearch";
 import { toast } from "sonner";
 import { formatUsd, todayISO } from "@/lib/format";
 import { getTodayRate } from "@/lib/queries";
@@ -115,21 +116,10 @@ function Page() {
         <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="text-sm font-medium">Producto</label>
-            <Select
-              value={form.product_id}
-              onValueChange={(v) => setForm({ ...form, product_id: v })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar" />
-              </SelectTrigger>
-              <SelectContent>
-                {products.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ProductSearch
+              products={products}
+              onSelect={(p) => setForm({ ...form, product_id: p.id })}
+            />
           </div>
           <div>
             <label className="text-sm font-medium">Proveedor</label>
